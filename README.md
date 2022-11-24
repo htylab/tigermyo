@@ -1,2 +1,2 @@
-# pymolli
+# tigermyo
 MOLLI system
