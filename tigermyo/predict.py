@@ -3,7 +3,7 @@ import onnxruntime
 import matplotlib.pyplot as plt
 
 def predict_mask(t1map):
-    model_onnx_path = 'tigermyo/torch_model.onnx'
+    model_onnx_path = 'tigermyo/SegT1map.onnx'
     session = onnxruntime.InferenceSession(model_onnx_path)
     session.get_modelmeta()
     
