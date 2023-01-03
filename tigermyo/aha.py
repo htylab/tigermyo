@@ -184,8 +184,36 @@ def bullseye_plot(ax, data, seg_bold=None, cmap=None, norm=None):
     ax.set_yticklabels([])
     ax.set_xticklabels([])
     
+def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
+    T1 = []
+    
+    #########  Slice B  ############
+    aha_seg = get_ahaseg(mask_B, nseg=6)
+    T1map_i = np.ndarray(shape=(6,T1map_B.shape[0],T1map_B.shape[1]))
+    for i in range(6):
+        T1map_i[i] = T1map_B*(aha_seg==i+1)
+        T1map_i[i][T1map_i[i] == 0] = np.nan
+        T1.append(np.nanmedian(T1map_i[i]))
 
-def aha17(data, path, label = 'T1(ms)', vmin=1100, vmax=1400):
+    #########  Slice M  ############
+    aha_seg = get_ahaseg(mask_M, nseg=6)
+    T1map_i = np.ndarray(shape=(6,T1map_M.shape[0],T1map_M.shape[1]))
+    for i in range(6):
+        T1map_i[i] = T1map_M*(aha_seg==i+1)
+        T1map_i[i][T1map_i[i] == 0] = np.nan
+        T1.append(np.nanmedian(T1map_i[i]))
+
+    #########  Slice A  ############
+    aha_seg = get_ahaseg(mask_A, nseg=4)
+    T1map_i = np.ndarray(shape=(4,T1map_A.shape[0],T1map_A.shape[1]))
+    for i in range(4):
+        T1map_i[i] = T1map_A*(aha_seg==i+1)
+        T1map_i[i][T1map_i[i] == 0] = np.nan
+        T1.append(np.nanmedian(T1map_i[i]))
+        
+    return T1
+
+def draw_aha17(data, path=None):
 
     # Make a figure and axes with dimensions as desired.
     fig, ax = plt.subplots(figsize=(8, 8), nrows=1, ncols=1,
@@ -199,17 +227,20 @@ def aha17(data, path, label = 'T1(ms)', vmin=1100, vmax=1400):
     # Set the colormap and norm to correspond to the data for which
     # the colorbar will be used.
     cmap = mpl.cm.cool
-    norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+    norm = mpl.colors.Normalize(vmin=1100, vmax=1400)
     # Create an empty ScalarMappable to set the colorbar's colormap and norm.
     # The following gives a basic continuous colorbar with ticks and labels.
-    fig.colorbar(mpl.cm.ScalarMappable(cmap=cmap, norm=norm),
-                cax=axl, orientation='horizontal', label=label)
+    cbar = fig.colorbar(mpl.cm.ScalarMappable(cmap=cmap, norm=norm),
+                cax=axl, orientation='horizontal') # cax=axl, orientation='horizontal', label='T1(ms)')
+    cbar.ax.tick_params(labelsize=16)
 
 
     # Create the 17 segment model
     bullseye_plot(ax, data,cmap=cmap, norm=norm)
-    ax.set_title('Bulls Eye (AHA)')
-    temp_T = np.around(data, decimals=2, out=None)
+    # ax.set_title('Bulls Eye (AHA)')
+    # temp_T = np.around(T1, decimals=2, out=None)
+    temp_T = [int(x) for x in data]
+
     for text,xytext, color in zip(*[temp_T,[(0.465, 0.825),(0.2, 0.675),(0.165, 0.35),(0.465, 0.15),(0.775, 0.35),(0.735, 0.675),(0.465, 0.715),(0.275, 0.615),(0.275, 0.365),(0.465, 0.255),(0.66, 0.365),(0.66, 0.615),(0.465, 0.615),(0.345, 0.475),(0.465, 0.365),(0.595, 0.475)],['k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k']]):
         ax.annotate(text,
                     xy=(0,0),  # theta, radius
@@ -218,8 +249,10 @@ def aha17(data, path, label = 'T1(ms)', vmin=1100, vmax=1400):
                     horizontalalignment='left',
                     verticalalignment='bottom',
                     color=color,
-                    size=12
+                    size=17
                     )
 
-    plt.savefig(f'{path}')
-    plt.close()
+    if path is None:
+        plt.show()
+    else:
+        plt.savefig(f'{path}')

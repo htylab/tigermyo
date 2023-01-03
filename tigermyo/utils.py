@@ -9,7 +9,7 @@ def read_molli_dir(dirname):
     im=[]
     Invtime=[]
     count=0
-    files = glob.glob(dirname+'\*')
+    files = glob.glob(dirname+'/*')
     for file in files:
         try:
             temp = dicom.read_file(file)
