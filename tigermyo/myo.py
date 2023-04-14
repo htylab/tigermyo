@@ -23,18 +23,18 @@ def main():
     args = parser.parse_args()
     run_args(args)
     
-def run(input_B = None, input_M = None, input_A = None, input_B_MOCO = None, input_M_MOCO = None, input_A_MOCO = None, output = None, iteration_VMT = 4, layering_mode = False):
+def run(config):
     args = argparse.Namespace()
 
-    args.input_B = input_B
-    args.input_M = input_M
-    args.input_A = input_A
-    args.input_B_MOCO = input_B_MOCO
-    args.input_M_MOCO = input_M_MOCO
-    args.input_A_MOCO = input_A_MOCO
-    args.iteration_VMT = iteration_VMT
-    args.layering_mode = layering_mode
-    args.output = output
+    args.input_B = config['input_B'] if 'input_B' in config.keys() else None
+    args.input_M = config['input_M'] if 'input_M' in config.keys() else None
+    args.input_A = config['input_A'] if 'input_A' in config.keys() else None
+    args.input_B_MOCO = config['input_B_MOCO'] if 'input_B_MOCO' in config.keys() else None
+    args.input_M_MOCO = config['input_M_MOCO'] if 'input_M_MOCO' in config.keys() else None
+    args.input_A_MOCO = config['input_A_MOCO'] if 'input_A_MOCO' in config.keys() else None
+    args.iteration_VMT = config['iteration_VMT'] if 'iteration_VMT' in config.keys() else 4
+    args.layering_mode = config['layering_mode'] if 'layering_mode' in config.keys() else False
+    args.output = config['output'] if 'output' in config.keys() else None
     
     return run_args(args)       
 

@@ -7,7 +7,7 @@
 
 
 ```
->>tigermyo --input_B c:\testB\ --input_B_MOCO c:\testB_MOCO --layering_mode
+>>tigermyo --input_B c:\testB\ --input_B_MOCO c:\testB_MOCO --layering_mode --output c:\result.png
 
 We only provide specific formats(nii.gz)
 --input_B: Path to the input basal section of MOLLI RAW data
@@ -27,7 +27,18 @@ pip install *
 ```
 ```
 import tigermyo
-tigermyo.run(r'c:\testB', r'c:\testM', r'c:\testA')
+
+config = {'input_B':"C:/Users/akt88/Desktop/KHVGH/test_B/",
+          'input_B_MOCO':"C:/Users/akt88/Desktop/KHVGH/test_B/",
+          'input_M':"C:/Users/akt88/Desktop/KHVGH/test_M/",
+          'input_M_MOCO':"C:/Users/akt88/Desktop/KHVGH/test_M/",
+          'input_A':"C:/Users/akt88/Desktop/KHVGH/test_A/",
+          'input_A_MOCO':"C:/Users/akt88/Desktop/KHVGH/test_A/",
+          'iteration_VMT': 4,
+          'layering_mode': True,
+          'output': "C:/Users/akt88/Desktop/KHVGH/result_1.png"}
+
+tigermyo.run(config)
 ```
 
 ## Citation
