@@ -18,7 +18,7 @@ def main():
     parser.add_argument('-input_M_MOCO', '--input_M_MOCO', type=str, default=None, help="Path to the input mid section of MOLLI MOCO data,it's a folder for the specific format(nii.gz)")
     parser.add_argument('-input_A_MOCO', '--input_A_MOCO', type=str, default=None, help="Path to the input apical section of MOLLI MOCO data,it's a folder for the specific format(nii.gz)")
     parser.add_argument('-iteration_VMT', "--iteration_VMT", type=int, default=4, help="Iterative VMTX registration times")
-    parser.add_argument('-layering_mode', "--layering_mode", type=bool, default=False, help="Take the middle layer of LVM as output")
+    parser.add_argument('-layering_mode', "--layering_mode", action='store_true', help="Take the middle layer of LVM as output")
     parser.add_argument('-output', "--output", type=str, default=None, help="Path to output AHA17 result,if there is no value will only display the figure")
     args = parser.parse_args()
     run_args(args)
@@ -46,9 +46,9 @@ def run_args(args):
     
     for i, path_bundle in enumerate(path_bundles):
         if path_bundle[0] is not None:
-            if i == 0: print("Start processing basal section")
-            elif i == 1: print("Start processing mid section")
-            elif i == 2: print("Start processing apical section")
+            if i == 0: print(f"Start processing basal section {'with layering mode' if args.layering_mode else ''}")
+            elif i == 1: print(f"Start processing mid section {'with layering mode' if args.layering_mode else ''}")
+            elif i == 2: print(f"Start processing apical section {'with layering mode' if args.layering_mode else ''}")
             
             print(f"Load Data: {path_bundle[0]}")
             im, invtime = utils.read_molli_dir(path_bundle[0])
@@ -57,17 +57,18 @@ def run_args(args):
                 moco_im, invtime = utils.read_molli_dir(path_bundle[1])
             else:
                 moco_im = None
+            print("Finish Data Loading!\n")
             
-            print("Starting LMT Reg\r", end='')
+            print("Starting LMT Reg...")
             regedToLast_im = registration.regToLast(im)
-            print("Finish LMT Reg")
-            print(f"VMTX Reg will Iterate {args.iteration_VMT} times")
-            print("Starting VMTX Reg\r", end='')
+            print("Finish LMT Reg!")
+            print(f"VMTX Reg will iterate {args.iteration_VMT} times")
+            print("Starting VMTX Reg...")
             regedToVMTX_im, _ = registration.regToVMTX(im, invtime, iteration=args.iteration_VMT)
-            print("Finish VMTX Reg")
+            print("Finish VMTX Reg!\n")
             
             reged_ims = [im, regedToLast_im, regedToVMTX_im, moco_im]
-            print("\nSelecting best registration result")
+            print("Selecting best registration result...")
             reged_ims_table, FQIs = selector.selector(reged_ims, invtime)
             best_idx = np.argmax(np.array(FQIs))
             print("FQI")
@@ -75,13 +76,12 @@ def run_args(args):
             print(f"LMT: {FQIs[1]:03f}")
             print(f"VMTX: {FQIs[2]:03f}")
             if FQIs[3] != float('-inf'):
-                print(f"MOCO: {FQIs[3]:03f}\n")
+                print(f"MOCO: {FQIs[3]:03f}")
             
-            if best_idx == 0: print("Select RAW result")
-            elif best_idx == 1: print("Select LMT result")
-            elif best_idx == 2: print("Select VMTX result")
-            else: print("Select MOCO result")
-            print()
+            if best_idx == 0: print("Select RAW result!\n")
+            elif best_idx == 1: print("Select LMT result!\n")
+            elif best_idx == 2: print("Select VMTX result!\n")
+            else: print("Select MOCO result!\n")
                 
             T1map = reged_ims_table[best_idx]['T1map']
             
@@ -90,30 +90,18 @@ def run_args(args):
             if args.layering_mode:
                 mask_layer = layering.layering_percent(mask, 2/3, 1/3)
                 
-                import matplotlib.pyplot as plt
-                
-                plt.imshow(mask)
-                plt.show()
-                plt.imshow(mask_layer[0])
-                plt.show()
-                plt.imshow(mask_layer[1])
-                plt.show()
-                plt.imshow(mask_layer[2])
-                plt.show()
-                
                 LV = mask == 1
                 LVM = mask_layer[1]
                 RV = mask == 3
                 
                 mask = LV * 1 + LVM * 2 + RV * 3
                 
-            
             T1maps.append(T1map)
             masks.append(mask)
         else:
-            if i == 0: print("No basal section data")
-            elif i == 1: print("No mid section data")
-            elif i == 2: print("No apical section data")
+            if i == 0: print("No basal section data!\n")
+            elif i == 1: print("No mid section data!\n")
+            elif i == 2: print("No apical section data!\n")
             
             T1maps.append(None)
             masks.append(None)
@@ -122,7 +110,7 @@ def run_args(args):
     
     data = aha.get_aha17(masks[0], masks[1], masks[2], T1maps[0], T1maps[1], T1maps[2])
     
-    aha.draw_aha17(data, args.output)   
+    aha.draw_aha17(data, args.output)
     
 if __name__ == "__main__":
     main()
