@@ -1,10 +1,14 @@
 import numpy as np
 import onnxruntime
 import matplotlib.pyplot as plt
+from tigermyo.utils import checkFileExit
 
 def predict_mask(t1map):
-    model_onnx_path = 'tigermyo/SegT1map.onnx'
-    session = onnxruntime.InferenceSession(model_onnx_path)
+    model_onnx = 'SegT1map.onnx'
+    
+    model_onnx = checkFileExit(model_onnx, "https://github.com/htylab/tigermyo/releases/download/v0.0.1/SegT1map.onnx")
+    
+    session = onnxruntime.InferenceSession(model_onnx)
     session.get_modelmeta()
     
     t1map[t1map<300] = 0

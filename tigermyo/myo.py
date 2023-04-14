@@ -6,6 +6,8 @@ from tigermyo import registration
 from tigermyo import selector
 import argparse
 import numpy as np
+import platform
+import os
 
 def main():
     parser = argparse.ArgumentParser()
@@ -19,7 +21,24 @@ def main():
     parser.add_argument('-layering_mode', "--layering_mode", type=bool, default=False, help="Take the middle layer of LVM as output")
     parser.add_argument('-output', "--output", type=str, default=None, help="Path to output AHA17 result,if there is no value will only display the figure")
     args = parser.parse_args()
+    run_args(args)
     
+def run(input_B = None, input_M = None, input_A = None, input_B_MOCO = None, input_M_MOCO = None, input_A_MOCO = None, output = None, iteration_VMT = 4, layering_mode = False):
+    args = argparse.Namespace()
+
+    args.input_B = input_B
+    args.input_M = input_M
+    args.input_A = input_A
+    args.input_B_MOCO = input_B_MOCO
+    args.input_M_MOCO = input_M_MOCO
+    args.input_A_MOCO = input_A_MOCO
+    args.iteration_VMT = iteration_VMT
+    args.layering_mode = layering_mode
+    args.output = output
+    
+    return run_args(args)       
+
+def run_args(args):
     path_bundles = [[args.input_B, args.input_B_MOCO], [args.input_M, args.input_M_MOCO], [args.input_A, args.input_A_MOCO]]
     
     T1maps = []
@@ -103,7 +122,10 @@ def main():
     
     data = aha.get_aha17(masks[0], masks[1], masks[2], T1maps[0], T1maps[1], T1maps[2])
     
-    aha.draw_aha17(data)
+    aha.draw_aha17(data)   
     
 if __name__ == "__main__":
     main()
+    
+    if platform.system() == 'Windows':
+        os.system('pause')

@@ -7,6 +7,7 @@ from scipy.signal import medfilt2d
 import ctypes
 import platform
 from numpy.ctypeslib import ndpointer
+from tigermyo.utils import T1mapCal, checkFileExit
 
 def regMOLLI(im, target_im):
     reged_im = np.zeros_like(im)
@@ -146,7 +147,7 @@ def mutual_information(image1, image2):
 # Perform Xue's paper
 def fitting_and_reg(img, Invtime, iteration=4):
     Img = img.copy()
-    dT1LL = T1LLmap(Img, Invtime)
+    dT1LL = T1mapCal(Img, Invtime)
     T1map = dT1LL['T1map']
     Amap = dT1LL['Amap']
     Bmap = dT1LL['Bmap']
@@ -161,7 +162,7 @@ def fitting_and_reg(img, Invtime, iteration=4):
             syn_temp = medfilt2d(syn_temp)
             _, resampler = reg_spline_MI(syn_temp, medfilt2d(Img[ii]), meshsize=7)
             Img[ii] = reg_move_it(resampler,Img[ii])
-        dT1LL = T1LLmap(Img, Invtime)
+        dT1LL = T1mapCal(Img, Invtime)
         T1map = dT1LL['T1map']
         Amap = dT1LL['Amap']
         Bmap = dT1LL['Bmap']
@@ -189,62 +190,6 @@ def synImg_cal2(synTI, Amap, Bmap, T1starmap):
         synImg = abs(Amap-Bmap*np.exp(-synTI/T1starmap))
 
     return synImg
-
-# Calculate function parameters and T1map
-def T1LLmap(im, Invtime, threshold = 40):
-    TI_num = im.shape[0]
-    mat_m = im.shape[1]
-    mat_n = im.shape[2]
-    mat_size = mat_m * mat_n
-
-    if platform.system() == 'Windows':
-        dllpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'T1map.dll')
-        lb = ctypes.CDLL(dllpath)
-        lib = ctypes.WinDLL("",handle=lb._handle)
-    else: #linux
-        dllpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'T1map.so')
-        lib = ctypes.CDLL(dllpath)
-
-    syn = lib.syn    
-
-    # Define the types of the output and arguments of this function.
-    syn.restype = None
-    syn.argtypes = [ndpointer(ctypes.c_double), 
-                    ctypes.c_int,
-                    ndpointer(ctypes.c_double),
-                    ctypes.c_long,ctypes.c_double,
-                    ndpointer(ctypes.c_double),
-                    ndpointer(ctypes.c_double),
-                    ndpointer(ctypes.c_double),
-                    ndpointer(ctypes.c_double),
-                    ndpointer(ctypes.c_double)]
-
-    T1map = np.empty((1, mat_size), dtype=np.double)
-    Amap = np.empty((1, mat_size), dtype=np.double)
-    Bmap = np.empty((1, mat_size), dtype=np.double)
-    T1starmap = np.empty((1, mat_size), dtype=np.double)
-    Errmap = np.empty((1, mat_size), dtype=np.double)
-    # We execute the C function, which will update the array.
-    # 40 is threshold
-    syn(Invtime, TI_num, im.flatten('f'), mat_size,
-        threshold, T1map, Amap, Bmap, T1starmap, Errmap)
-
-
-    if platform.system() == 'Windows':
-
-        from ctypes.wintypes import HMODULE
-        ctypes.windll.kernel32.FreeLibrary.argtypes = [HMODULE]
-        ctypes.windll.kernel32.FreeLibrary(lb._handle)
-    else:
-        pass
-        #lib.dlclose(lib._handle)
-
-    dT1LL = dict()
-
-    for key in ('T1map', 'Amap', 'Bmap', 'T1starmap', 'Errmap'):
-        dT1LL[key] = np.reshape(locals()[key], (mat_m, mat_n), 'f')
-
-    return dT1LL
 
 # Regstration
 def reg_spline_MI(fixed_np, moving_np, fixed_mask_np=None, meshsize=10):
@@ -300,8 +245,11 @@ def reg_move_it(resampler, img_np):
     return img_reg_np
 
 def regToVMTX(im, invtime, iteration = 4):
-    model_onnx_path = 'tigermyo/VMT.onnx'
-    session = onnxruntime.InferenceSession(model_onnx_path)
+    model_onnx = 'VMT.onnx'
+    
+    model_onnx = checkFileExit(model_onnx, "https://github.com/htylab/tigermyo/releases/download/v0.0.1/VMT.onnx")
+    
+    session = onnxruntime.InferenceSession(model_onnx)
     session.get_modelmeta()
 
     last_im = im[-1, ...]
