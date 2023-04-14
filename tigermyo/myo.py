@@ -122,7 +122,7 @@ def run_args(args):
     
     data = aha.get_aha17(masks[0], masks[1], masks[2], T1maps[0], T1maps[1], T1maps[2])
     
-    aha.draw_aha17(data)   
+    aha.draw_aha17(data, args.output)   
     
 if __name__ == "__main__":
     main()
