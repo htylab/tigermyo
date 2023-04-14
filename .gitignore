@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# C extensions
+*.so
+*.dll
+
 # Distribution / packaging
 .Python
 build/
@@ -125,6 +129,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-testDataM/
-testDataM_MOCO/
+# Model weights
 *.onnx

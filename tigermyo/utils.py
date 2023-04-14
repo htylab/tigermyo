@@ -43,8 +43,6 @@ def T1mapCal(im, Invtime, threshold = 40):
     mat_n = im.shape[2]
     mat_size = mat_m * mat_n
 
-
-
     if platform.system() == 'Windows':
         dllpath = os.path.join(os.path.dirname(os.path.abspath(__file__)),'T1map.dll')
         lb = ctypes.CDLL(dllpath)

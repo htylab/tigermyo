@@ -188,28 +188,40 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
     T1 = []
     
     #########  Slice B  ############
-    aha_seg = get_ahaseg(mask_B, nseg=6)
-    T1map_i = np.ndarray(shape=(6,T1map_B.shape[0],T1map_B.shape[1]))
-    for i in range(6):
-        T1map_i[i] = T1map_B*(aha_seg==i+1)
-        T1map_i[i][T1map_i[i] == 0] = np.nan
-        T1.append(np.nanmedian(T1map_i[i]))
+    if mask_B is not None:
+        aha_seg = get_ahaseg(mask_B, nseg=6)
+        T1map_i = np.ndarray(shape=(6,T1map_B.shape[0],T1map_B.shape[1]))
+        for i in range(6):
+            T1map_i[i] = T1map_B*(aha_seg==i+1)
+            T1map_i[i][T1map_i[i] == 0] = np.nan
+            T1.append(np.nanmedian(T1map_i[i]))
+    else:
+        for i in range(6):
+            T1.append(0)
 
     #########  Slice M  ############
-    aha_seg = get_ahaseg(mask_M, nseg=6)
-    T1map_i = np.ndarray(shape=(6,T1map_M.shape[0],T1map_M.shape[1]))
-    for i in range(6):
-        T1map_i[i] = T1map_M*(aha_seg==i+1)
-        T1map_i[i][T1map_i[i] == 0] = np.nan
-        T1.append(np.nanmedian(T1map_i[i]))
+    if mask_M is not None:
+        aha_seg = get_ahaseg(mask_M, nseg=6)
+        T1map_i = np.ndarray(shape=(6,T1map_M.shape[0],T1map_M.shape[1]))
+        for i in range(6):
+            T1map_i[i] = T1map_M*(aha_seg==i+1)
+            T1map_i[i][T1map_i[i] == 0] = np.nan
+            T1.append(np.nanmedian(T1map_i[i]))
+    else:
+        for i in range(6):
+            T1.append(0)
 
     #########  Slice A  ############
-    aha_seg = get_ahaseg(mask_A, nseg=4)
-    T1map_i = np.ndarray(shape=(4,T1map_A.shape[0],T1map_A.shape[1]))
-    for i in range(4):
-        T1map_i[i] = T1map_A*(aha_seg==i+1)
-        T1map_i[i][T1map_i[i] == 0] = np.nan
-        T1.append(np.nanmedian(T1map_i[i]))
+    if mask_A is not None:
+        aha_seg = get_ahaseg(mask_A, nseg=4)
+        T1map_i = np.ndarray(shape=(4,T1map_A.shape[0],T1map_A.shape[1]))
+        for i in range(4):
+            T1map_i[i] = T1map_A*(aha_seg==i+1)
+            T1map_i[i][T1map_i[i] == 0] = np.nan
+            T1.append(np.nanmedian(T1map_i[i]))
+    else:
+        for i in range(4):
+            T1.append(0)
         
     return T1
 
