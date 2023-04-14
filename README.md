@@ -28,15 +28,15 @@ pip install *
 ```
 import tigermyo
 
-config = {'input_B':"C:/Users/akt88/Desktop/KHVGH/test_B/",
-          'input_B_MOCO':"C:/Users/akt88/Desktop/KHVGH/test_B/",
-          'input_M':"C:/Users/akt88/Desktop/KHVGH/test_M/",
-          'input_M_MOCO':"C:/Users/akt88/Desktop/KHVGH/test_M/",
-          'input_A':"C:/Users/akt88/Desktop/KHVGH/test_A/",
-          'input_A_MOCO':"C:/Users/akt88/Desktop/KHVGH/test_A/",
+config = {'input_B':"c:\test_B\",
+          'input_B_MOCO':"c:\test_B_MOCO\",
+          'input_M':"c:\test_M/",
+          'input_M_MOCO':"c:\test_M_MOCO\",
+          'input_A':"c:\test_A/",
+          'input_A_MOCO':"c:\test_A_MOCO\",
           'iteration_VMT': 4,
           'layering_mode': True,
-          'output': "C:/Users/akt88/Desktop/KHVGH/result_1.png"}
+          'output': "c:\result.png"}
 
 tigermyo.run(config)
 ```
