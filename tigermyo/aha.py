@@ -194,7 +194,10 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
         for i in range(6):
             T1map_i[i] = T1map_B*(aha_seg==i+1)
             T1map_i[i][T1map_i[i] == 0] = np.nan
-            T1.append(np.nanmedian(T1map_i[i]))
+            if np.nanmedian(T1map_i[i]) == np.nan:
+                T1.append(0)
+            else:
+                T1.append(np.nanmedian(T1map_i[i]))     
     else:
         for i in range(6):
             T1.append(0)
@@ -206,7 +209,10 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
         for i in range(6):
             T1map_i[i] = T1map_M*(aha_seg==i+1)
             T1map_i[i][T1map_i[i] == 0] = np.nan
-            T1.append(np.nanmedian(T1map_i[i]))
+            if np.nanmedian(T1map_i[i]) == np.nan:
+                T1.append(0)
+            else:
+                T1.append(np.nanmedian(T1map_i[i]))     
     else:
         for i in range(6):
             T1.append(0)
@@ -218,7 +224,10 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
         for i in range(4):
             T1map_i[i] = T1map_A*(aha_seg==i+1)
             T1map_i[i][T1map_i[i] == 0] = np.nan
-            T1.append(np.nanmedian(T1map_i[i]))
+            if np.nanmedian(T1map_i[i]) == np.nan:
+                T1.append(0)
+            else:
+                T1.append(np.nanmedian(T1map_i[i]))     
     else:
         for i in range(4):
             T1.append(0)

@@ -6,7 +6,8 @@ def calculateFQI(im, Errmap):
     SS_im_mean = np.mean(im, axis=0)
     SS_total = np.sum(np.square(im - SS_im_mean), axis=0)
     SS_res = np.square(Errmap)
-    R2_map = 1 - SS_res/SS_total
+    with np.errstate(divide='ignore', invalid='ignore'):
+        R2_map = 1 - SS_res/SS_total
     return R2_map, np.nanmean(R2_map)
 
 def selector(reged_ims, invtime):
