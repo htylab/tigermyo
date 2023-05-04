@@ -188,7 +188,7 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
     T1 = []
     
     #########  Slice B  ############
-    if mask_B is not None:
+    if not np.isnan(mask_B):
         aha_seg = get_ahaseg(mask_B, nseg=6)
         T1map_i = np.ndarray(shape=(6,T1map_B.shape[0],T1map_B.shape[1]))
         for i in range(6):
@@ -203,7 +203,7 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
             T1.append(0)
 
     #########  Slice M  ############
-    if mask_M is not None:
+    if not np.isnan(mask_M):
         aha_seg = get_ahaseg(mask_M, nseg=6)
         T1map_i = np.ndarray(shape=(6,T1map_M.shape[0],T1map_M.shape[1]))
         for i in range(6):
@@ -218,7 +218,7 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
             T1.append(0)
 
     #########  Slice A  ############
-    if mask_A is not None:
+    if not np.isnan(mask_A):
         aha_seg = get_ahaseg(mask_A, nseg=4)
         T1map_i = np.ndarray(shape=(4,T1map_A.shape[0],T1map_A.shape[1]))
         for i in range(4):
@@ -232,7 +232,7 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
         for i in range(4):
             T1.append(0)
         
-    return T1
+    return T1[0:6], T1[6:12], T1[12:16]
 
 def draw_aha17(data, path=None):
 
@@ -276,4 +276,4 @@ def draw_aha17(data, path=None):
     if path is None:
         plt.show()
     else:
-        plt.savefig(f'{path}')
+        plt.savefig(f'{path}.png')

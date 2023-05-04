@@ -7,19 +7,19 @@
 
 
 ```
->>tigermyo --input_B c:\testB\ --input_B_MOCO c:\testB_MOCO\ --layering_mode --output c:\result.png
+>>tigermyo -B c:\testB\ -BM c:\testB_MOCO\ -i 1 -l -o c:\result
 
 We only provide specific formats(.dcm)
---input_B: Path to the input basal section of MOLLI RAW data
---input_M: Path to the input mid section of MOLLI RAW data
---input_A: Path to the input apical section of MOLLI RAW data
---input_B_MOCO: Path to the input basal section of MOLLI MOCO data
---input_M_MOCO: Path to the input mid section of MOLLI MOCO data
---input_A_MOCO: Path to the input apical section of MOLLI MOCO data
---only_use: Only use a certain method to calculate (1:input 2:LMT 3:VMTX)
---iteration_VMTX: Iterative VMTX registration times
---layering_mode: Take the middle layer of LVM as output
---output: Path to output AHA17 result,if there is no value will only display the figure
+-B: Path to the input basal section of MOLLI RAW data
+-M: Path to the input mid section of MOLLI RAW data
+-A: Path to the input apical section of MOLLI RAW data
+-BM: Path to the input basal section of MOLLI MOCO data
+-MM: Path to the input mid section of MOLLI MOCO data
+-AM: Path to the input apical section of MOLLI MOCO data
+-only: Only use a certain method to calculate (1:input 2:LMT 3:VMTX)
+-i: Iterative VMTX registration times
+-l: Take the middle layer of LVM as output
+-o: Path to output ALL results, if there is no value will only display the figure
 ```
 
 ### As a python package
@@ -38,7 +38,7 @@ config = {'input_B':"c:\test_B\",
           'only_use': 3,
           'iteration_VMTX': 4,
           'layering_mode': True,
-          'output': "c:\result.png"}
+          'output': "c:\result"}
 
 tigermyo.run(config)
 ```
