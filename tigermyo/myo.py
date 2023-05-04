@@ -21,7 +21,7 @@ def main():
     parser.add_argument('-only', '--only_use', type=int, default=0, help="Only use a certain method to calculate (1:input 2:LMT 3:VMTX)")
     parser.add_argument('-i', '--iteration_VMTX', type=int, default=4, help="Iterative VMTX registration times")
     parser.add_argument('-l', '--layering_mode', action='store_true', help="Take the middle layer of LVM as output")
-    parser.add_argument("-o", '--output', type=str, default=None, help="Path to output ALL results, if there is no value will only display the figure of AHA")
+    parser.add_argument("-o", '--output', type=str, default=None, help="Path to output results, if there is no value will only display the figure of AHA")
     args = parser.parse_args()
     run_args(args)
     
@@ -76,7 +76,7 @@ def run_args(args):
                 print("Starting LMT Reg...")
                 regedToLast_im = registration.regToLast(im)
                 reged_ims.append(regedToLast_im)
-                print("Finish LMT Reg!")
+                print("Finish LMT Reg!\n")
 
             if args.only_use == 0 or args.only_use == 3:
                 print(f"VMTX Reg will iterate {args.iteration_VMTX} times")
@@ -108,30 +108,37 @@ def run_args(args):
             if args.only_use == 0:
                 if best_idx == 0:
                     print("Select RAW result!\n")
+                    results[f'{section}RegedImage'] = reged_ims[0]
                     results[f'{section}Selection'] = 'RAW'
                     results[f'{section}FQI'] = FQIs[0]
                 elif best_idx == 1:
                     print("Select LMT result!\n")
+                    results[f'{section}RegedImage'] = reged_ims[1]
                     results[f'{section}Selection'] = 'LMT'
                     results[f'{section}FQI'] = FQIs[1]
                 elif best_idx == 2:
                     print("Select VMTX result!\n")
+                    results[f'{section}RegedImage'] = reged_ims[2]
                     results[f'{section}Selection'] = 'VMTX'
                     results[f'{section}FQI'] = FQIs[2]
                 else:
                     print("Select MOCO result!\n")
+                    results[f'{section}RegedImage'] = reged_ims[3]
                     results[f'{section}Selection'] = 'MOCO'
                     results[f'{section}FQI'] = FQIs[3]
             elif args.only_use == 1:
                 print("Select RAW result!\n")
+                results[f'{section}RegedImage'] = reged_ims[0]
                 results[f'{section}Selection'] = 'RAW'
                 results[f'{section}FQI'] = FQIs[0]
             elif args.only_use == 2:
                 print("Select LMT result!\n")
+                results[f'{section}RegedImage'] = reged_ims[0]
                 results[f'{section}Selection'] = 'LMT'
                 results[f'{section}FQI'] = FQIs[0]
             elif args.only_use == 3:
                 print("Select VMTX result!\n")
+                results[f'{section}RegedImage'] = reged_ims[0]
                 results[f'{section}Selection'] = 'VMTX'
                 results[f'{section}FQI'] = FQIs[0]
                 
@@ -139,7 +146,7 @@ def run_args(args):
             results[f'{section}T1map'] = T1map
             
             mask = predict.predict_mask(T1map)
-            results[f'{section}Mask'] = mask
+            results[f'{section}HeartMask'] = mask
             
             if args.layering_mode:
                 mask_layer = layering.layering_percent(mask, 2/3, 1/3)
@@ -149,26 +156,37 @@ def run_args(args):
                 RV = mask == 3
                 
                 mask = LV * 1 + LVM * 2 + RV * 3
-                results[f'{section}Mask'] = mask
+                results[f'{section}LayeringMask'] = mask
+            else:
+                results[f'{section}LayeringMask'] = np.empty((1,1))
+                results[f'{section}LayeringMask'][:] = np.nan
 
         else:
             print(f"No {section.lower()} section data!\n")
             
             results[f'{section}Selection'] = 'No Data'
-            results[f'{section}FQI'] = np.nan
-            results[f'{section}T1map'] = np.nan
-            results[f'{section}Mask'] = np.nan
+            results[f'{section}FQI'] = np.empty((1,1))
+            results[f'{section}FQI'][:] = np.nan
+            results[f'{section}T1map'] = np.empty((1,1))
+            results[f'{section}T1map'][:] = np.nan
+            results[f'{section}HeartMask'] = np.empty((1,1))
+            results[f'{section}HeartMask'][:] = np.nan
+            results[f'{section}LayeringMask'] = np.empty((1,1))
+            results[f'{section}LayeringMask'][:] = np.nan
             
             print()
     
-    results['BasalT1'], results['MidT1'], results['ApicalT1'] = aha.get_aha17(results['BasalMask'], results['MidMask'], results['ApicalMask'], results['BasalT1map'], results['MidT1map'], results['ApicalT1map'])
+    results['BasalT1'], results['MidT1'], results['ApicalT1'], results['BasalAHAMask'], results['MidAHAMask'], results['ApicalAHAMask'] = aha.get_aha17(results['BasalHeartMask'] if results['BasalLayeringMask'].size != 1 else results['BasalLayeringMask'],\
+                                                                                                                                                        results['MidHeartMask'] if results['MidLayeringMask'].size != 1 else results['MidLayeringMask'],\
+                                                                                                                                                        results['ApicalHeartMask'] if results['ApicalLayeringMask'].size != 1 else results['ApicalLayeringMask'],\
+                                                                                                                                                        results['BasalT1map'],\
+                                                                                                                                                        results['MidT1map'],\
+                                                                                                                                                        results['ApicalT1map'])
     T1 = results['BasalT1'] + results['MidT1'] + results['ApicalT1']
     
     aha.draw_aha17(T1, args.output)
     savemat(f"{args.output}.mat", results)
 
-    
-    
 if __name__ == "__main__":
     main()
     

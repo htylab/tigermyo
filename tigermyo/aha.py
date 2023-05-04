@@ -188,11 +188,13 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
     T1 = []
     
     #########  Slice B  ############
-    if not np.isnan(mask_B):
-        aha_seg = get_ahaseg(mask_B, nseg=6)
+    aha_seg_B = np.empty((1,1))
+    aha_seg_B[:] = np.nan
+    if mask_B.size != 1:
+        aha_seg_B = get_ahaseg(mask_B, nseg=6)
         T1map_i = np.ndarray(shape=(6,T1map_B.shape[0],T1map_B.shape[1]))
         for i in range(6):
-            T1map_i[i] = T1map_B*(aha_seg==i+1)
+            T1map_i[i] = T1map_B*(aha_seg_B==i+1)
             T1map_i[i][T1map_i[i] == 0] = np.nan
             if np.nanmedian(T1map_i[i]) == np.nan:
                 T1.append(0)
@@ -203,11 +205,13 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
             T1.append(0)
 
     #########  Slice M  ############
-    if not np.isnan(mask_M):
-        aha_seg = get_ahaseg(mask_M, nseg=6)
+    aha_seg_M = np.empty((1,1))
+    aha_seg_M[:] = np.nan
+    if mask_M .size != 1:
+        aha_seg_M = get_ahaseg(mask_M, nseg=6)
         T1map_i = np.ndarray(shape=(6,T1map_M.shape[0],T1map_M.shape[1]))
         for i in range(6):
-            T1map_i[i] = T1map_M*(aha_seg==i+1)
+            T1map_i[i] = T1map_M*(aha_seg_M==i+1)
             T1map_i[i][T1map_i[i] == 0] = np.nan
             if np.nanmedian(T1map_i[i]) == np.nan:
                 T1.append(0)
@@ -218,11 +222,13 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
             T1.append(0)
 
     #########  Slice A  ############
-    if not np.isnan(mask_A):
-        aha_seg = get_ahaseg(mask_A, nseg=4)
+    aha_seg_A = np.empty((1,1))
+    aha_seg_A[:] = np.nan
+    if mask_A.size != 1:
+        aha_seg_A = get_ahaseg(mask_A, nseg=4)
         T1map_i = np.ndarray(shape=(4,T1map_A.shape[0],T1map_A.shape[1]))
         for i in range(4):
-            T1map_i[i] = T1map_A*(aha_seg==i+1)
+            T1map_i[i] = T1map_A*(aha_seg_A==i+1)
             T1map_i[i][T1map_i[i] == 0] = np.nan
             if np.nanmedian(T1map_i[i]) == np.nan:
                 T1.append(0)
@@ -232,7 +238,7 @@ def get_aha17(mask_B, mask_M, mask_A, T1map_B, T1map_M, T1map_A):
         for i in range(4):
             T1.append(0)
         
-    return T1[0:6], T1[6:12], T1[12:16]
+    return T1[0:6], T1[6:12], T1[12:16], aha_seg_B, aha_seg_M, aha_seg_A
 
 def draw_aha17(data, path=None):
 
